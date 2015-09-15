@@ -55,8 +55,8 @@ public class LocationTest extends AppCompatActivity implements GoogleApiClient.C
 
     private void buildGoogleApiClient() {
         mGac = new GoogleApiClient.Builder(this)
-                .addApi(LocationServices.API).addConnectionCallbacks(this)
-                .addApi(ActivityRecognition.API)
+                .addApi(LocationServices.API).addConnectionCallbacks(this) //add this for location
+                .addApi(ActivityRecognition.API) //add this for Activity recognition
                 .addOnConnectionFailedListener(this)
                 .build();
     }
@@ -189,6 +189,15 @@ public class LocationTest extends AppCompatActivity implements GoogleApiClient.C
 
 
     public class DetectedActivityIntentReceiver extends BroadcastReceiver {
+        public static final int IN_VEHICLE = 0;
+        public static final int ON_BICYCLE = 1;
+        public static final int ON_FOOT = 2;
+        public static final int STILL = 3;
+        public static final int UNKNOWN = 4;
+        public static final int TILTING = 5;
+        public static final int WALKING = 7;
+        public static final int RUNNING = 8;
+
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction() == "me.larikraun") {
@@ -196,7 +205,7 @@ public class LocationTest extends AppCompatActivity implements GoogleApiClient.C
                 if (activities != null && !activities.isEmpty()) {
                     String activitiesList = "";
                     for (DetectedActivity detectedActivity : activities) {
-                        activitiesList = activitiesList + detectedActivity.getType() + " " + detectedActivity.getConfidence() + "\n";
+                        activitiesList = activitiesList + getActivityName(detectedActivity.getType()) + " " + detectedActivity.getConfidence() + "\n";
                         detectedActivities.setText(activitiesList);
                     }
                 } else {
@@ -204,6 +213,29 @@ public class LocationTest extends AppCompatActivity implements GoogleApiClient.C
                 }
             }
 
+        }
+
+        private String getActivityName(int typeCode) {
+            switch (typeCode) {
+                case DetectedActivity.IN_VEHICLE:
+                    return "in vehicle";
+                case DetectedActivity.ON_BICYCLE:
+                    return "on bike";
+                case DetectedActivity.ON_FOOT:
+                    return "on foot";
+                case DetectedActivity.STILL:
+                    return "still";
+                case DetectedActivity.UNKNOWN:
+                    return "unknown";
+                case DetectedActivity.TILTING:
+                    return "tilting";
+                case DetectedActivity.WALKING:
+                    return "walking";
+                case DetectedActivity.RUNNING:
+                    return "running";
+                default:
+                    return "unknown";
+            }
         }
     }
 }

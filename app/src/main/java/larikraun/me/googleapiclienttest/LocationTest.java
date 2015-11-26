@@ -22,20 +22,17 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.ActivityRecognition;
 import com.google.android.gms.location.DetectedActivity;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 import java.util.ArrayList;
 
 public class LocationTest extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener, ResultCallback<Status>, View.OnClickListener {
+
     private final String TAG = "Test App";
     public TextView latitude_tv, longitude_tv, detectedActivities;
     PendingIntent mActivityDetectionPendingIntent;
     private GoogleApiClient mGac;
-    private LocationRequest mLocationRequest;
-    private Button removeButton, requestButton;
-    private Location mLastLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,8 +42,8 @@ public class LocationTest extends AppCompatActivity implements GoogleApiClient.C
         latitude_tv = (TextView) findViewById(R.id.latitude_holder);
         longitude_tv = (TextView) findViewById(R.id.longitude_holder);
         detectedActivities = (TextView) findViewById(R.id.activity_update_holder);
-        requestButton = (Button) findViewById(R.id.request_activity);
-        removeButton = (Button) findViewById(R.id.remove_activity);
+        Button requestButton = (Button) findViewById(R.id.request_activity);
+        Button removeButton = (Button) findViewById(R.id.remove_activity);
         requestButton.setOnClickListener(this);
         removeButton.setOnClickListener(this);
         buildGoogleApiClient();
@@ -56,7 +53,7 @@ public class LocationTest extends AppCompatActivity implements GoogleApiClient.C
     private void buildGoogleApiClient() {
         mGac = new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API).addConnectionCallbacks(this) //add this for location
-                .addApi(ActivityRecognition.API) //add this for Activity recognition
+              //  .addApi(ActivityRecognition.API) //add this for Activity recognition
                 .addOnConnectionFailedListener(this)
                 .build();
     }
@@ -99,12 +96,8 @@ public class LocationTest extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onConnected(Bundle bundle) {
-        /*This block gets updates on location
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequest.setInterval(1000);
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGac, mLocationRequest, this);*/
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGac);
+
+        Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGac);
         if (mLastLocation != null) {
             latitude_tv.setText("" + mLastLocation.getLatitude());
             longitude_tv.setText("" + mLastLocation.getLongitude());
@@ -118,9 +111,8 @@ public class LocationTest extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        latitude_tv.setText("failed");
+        latitude_tv.setText(connectionResult.getErrorCode());
     }
-
 
     @Override
     public void onLocationChanged(Location location) {
@@ -132,27 +124,28 @@ public class LocationTest extends AppCompatActivity implements GoogleApiClient.C
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.remove_activity:
-                removeUpdate();
+                removeActivityUpdate();
                 break;
             case R.id.request_activity:
-                requestUpdate();
+                requestActivityUpdate();
                 break;
         }
     }
 
-    private void requestUpdate() {
+    private void requestActivityUpdate() {
         ActivityRecognition.ActivityRecognitionApi
                 .requestActivityUpdates(mGac, 2000, getActivityDetectionPendingIntent())
                 .setResultCallback(this);
 
     }
 
-    private void removeUpdate() {
+    private void removeActivityUpdate() {
         ActivityRecognition.ActivityRecognitionApi
                 .removeActivityUpdates(mGac, getActivityDetectionPendingIntent())
                 .setResultCallback(this);
 
     }
+
 
     /**
      * Gets a PendingIntent to be sent for each activity detection.
@@ -169,6 +162,7 @@ public class LocationTest extends AppCompatActivity implements GoogleApiClient.C
         // requestActivityUpdates() and removeActivityUpdates().
         return PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
+
 
     @Override
     protected void onPause() {
@@ -189,15 +183,6 @@ public class LocationTest extends AppCompatActivity implements GoogleApiClient.C
 
 
     public class DetectedActivityIntentReceiver extends BroadcastReceiver {
-        public static final int IN_VEHICLE = 0;
-        public static final int ON_BICYCLE = 1;
-        public static final int ON_FOOT = 2;
-        public static final int STILL = 3;
-        public static final int UNKNOWN = 4;
-        public static final int TILTING = 5;
-        public static final int WALKING = 7;
-        public static final int RUNNING = 8;
-
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction() == "me.larikraun") {
@@ -215,6 +200,10 @@ public class LocationTest extends AppCompatActivity implements GoogleApiClient.C
 
         }
 
+        /**
+         * @param typeCode code
+         * @return Activity
+         */
         private String getActivityName(int typeCode) {
             switch (typeCode) {
                 case DetectedActivity.IN_VEHICLE:

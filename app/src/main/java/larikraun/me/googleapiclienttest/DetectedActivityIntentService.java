@@ -22,7 +22,7 @@ import java.util.ArrayList;
  */
 public class DetectedActivityIntentService extends IntentService {
     private static final String TAG = "DetectedIntentService";
-    ArrayList<DetectedActivity> dActivities;
+    ArrayList dActivities;
 
     public DetectedActivityIntentService() {
         super(TAG);

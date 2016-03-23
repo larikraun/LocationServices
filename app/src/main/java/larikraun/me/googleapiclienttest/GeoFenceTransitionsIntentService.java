@@ -76,7 +76,7 @@ public class GeoFenceTransitionsIntentService extends IntentService {
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
 
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, LocationTest.class), 0);
+                new Intent(this, NewGeofenceActivity.class), 0);
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)

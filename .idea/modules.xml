@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/GoogleAPIClientTest.iml" filepath="$PROJECT_DIR$/GoogleAPIClientTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/LocationServices.iml" filepath="$PROJECT_DIR$/LocationServices.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

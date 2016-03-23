@@ -10,6 +10,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -27,7 +28,7 @@ public class GeocodingActivity extends AppCompatActivity implements GoogleApiCli
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_geocoding);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        addressView = (TextView)findViewById(R.id.address_view);
+        addressView = (TextView) findViewById(R.id.address_view);
         setSupportActionBar(toolbar);
         buildGoogleApiClient();
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -37,7 +38,7 @@ public class GeocodingActivity extends AppCompatActivity implements GoogleApiCli
 //                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
 
-                Intent intent = new Intent(GeocodingActivity.this, GeoFenceTransitionsIntentService.class);
+                Intent intent = new Intent(GeocodingActivity.this, GeocodingIntentService.class);
                 intent.putExtra("location_details", mLastLocation);
                 startService(intent);
             }
@@ -51,6 +52,7 @@ public class GeocodingActivity extends AppCompatActivity implements GoogleApiCli
                 .addConnectionCallbacks(this).addOnConnectionFailedListener(this)
                 .build();
     }
+
     @Override
     protected void onStop() {
         super.onStop();
@@ -76,6 +78,7 @@ public class GeocodingActivity extends AppCompatActivity implements GoogleApiCli
         super.onResume();
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(new GeocodingReceiver(), new IntentFilter("me.larikraun.geocoding"));
     }
+
     @Override
     public void onConnected(Bundle bundle) {
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGac);
@@ -96,7 +99,8 @@ public class GeocodingActivity extends AppCompatActivity implements GoogleApiCli
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals("me.larikraun.geocoding")) {
-               String addresses = intent.getStringExtra("addresses");
+                String addresses = intent.getStringExtra("addresses");
+                Log.d("Geocoding", "Broadcast received "+ addresses);
                 addressView.setText(addresses);
             }
         }
